@@ -5,8 +5,6 @@
 
 #include <map>
 
-using std::map;
-
 using std::string;
 
 namespace Config
