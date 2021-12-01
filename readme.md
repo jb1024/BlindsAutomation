@@ -1,0 +1,1 @@
+The purpose of this project is to realise blinds automation by means of an Arduino Iot 33 module.

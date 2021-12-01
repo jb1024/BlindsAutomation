@@ -1,0 +1,15 @@
+---
+# We'll use defaults from the LLVM style, but with 4 columns indentation.
+BasedOnStyle: Microsoft
+IndentWidth: 2
+---
+Language: Cpp
+# Force pointers to the type for C++.
+#AllowAllConstructorInitializersOnNextLine: true
+#ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializers: BeforeComma
+
+AccessModifierOffset: -2
+AlignConsecutiveDeclarations: false
+DerivePointerAlignment: false
+PointerAlignment: Left
