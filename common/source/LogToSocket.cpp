@@ -11,12 +11,15 @@ CLogToSocket::~CLogToSocket()
   Log::UnregisterLogger(*this);
 }
 
-void CLogToSocket::Enable(IPAddress ip, uint16_t port)
+void CLogToSocket::Enable(const SSocketAddress& sa)
 {
-  mIp = fmt::format("{}.{}.{}.{}", ip[0], ip[1], ip[2], ip[3]);
-  mPort = port;
-  mSocket.begin(5001);
-  Log::RegisterLogger(*this);
+  mIp = fmt::format("{}.{}.{}.{}", sa.IPAddress[0], sa.IPAddress[1], sa.IPAddress[2], sa.IPAddress[3]);
+  mPort = sa.Port;
+  if (sa.Port > 0)
+  {
+    mSocket.begin(5001);
+    Log::RegisterLogger(*this);
+  }
 }
 
 void CLogToSocket::OnLog(Log::ESeverity level, const std::string& msg)

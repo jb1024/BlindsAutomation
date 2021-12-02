@@ -24,8 +24,8 @@ CSystem::~CSystem()
 
 bool CSystem::ConnectToWifi()
 {
-  auto ssid = Config::GetWifiSSID();
-  auto password = Config::GetWifiPassword();
+  auto ssid = Config::GetSsid();
+  auto password = Config::GetPassword();
 
   ssid = "join";
   password = "iNFQLWsm7LJRYV8T";
@@ -45,7 +45,7 @@ bool CSystem::ConnectToWifi()
     return false;
   }
 
-  mLogToSocket.Enable({10, 0, 0, 30}, 5001);
+  mLogToSocket.Enable(Config::GetUdpLogger());
 
   // Config::GetUDPLoggerIp();
   auto ip = WiFi.localIP();
@@ -58,7 +58,7 @@ bool CSystem::CreateAccessPoint()
 {
   Log::Info("Creating access point...");
   WiFi.config(IPAddress(10, 0, 0, 1));
-  auto status = WiFi.beginAP(Config::GetHostName().c_str());
+  auto status = WiFi.beginAP(Config::GetHostname().c_str());
   if (status != WL_AP_LISTENING)
   {
     Log::Error("Unable to create access point.");
@@ -73,10 +73,11 @@ bool CSystem::CreateAccessPoint()
 void CSystem::Initialize()
 {
   Config::Load();
+
   mLeds.SetDelay(500);
   mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
 
-  auto hostname = Config::GetHostName();
+  auto hostname = Config::GetHostname();
   WiFi.setHostname(hostname.c_str());
 
   if (ConnectToWifi())

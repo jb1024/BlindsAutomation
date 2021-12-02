@@ -1,133 +1,231 @@
-#include "Config.h"
-
-#include "Log.h"
-#include "WiFiNINA.h"
-
 #include <map>
+
+#include <WiFiNINA.h>
+
+#include "Config.h"
+#include "Log.h"
+#include "Parser.h"
 
 using std::string;
 
 namespace Config
 {
 
-using ConfigMap = std::map<std::string, std::string>;
+const string ConfigFile = "/fs/config";
 
-#define CONFIG_FILE "/fs/config"
-
-const uint8_t NumberOfPresets = 4;
-
-struct SConfig
+enum class EField
 {
-  char Hostname[40];
-  char Ssid[40];
-  char Password[40];
-  IPAddress UDPLoggerIP;
-  uint16_t UDPLoggerPort;
-  double Presets[NumberOfPresets];
+  Illegal, // Only used to indicate an illegal conversion from string
+  Hostname,
+  Ssid,
+  Password,
+  UdpLogger,
+  Preset1,
+  Preset2,
+  Preset3,
+  Preset4,
 };
 
-SConfig config;
+using TConfigMap = std::map<EField, string>;
 
-bool Reset()
+const TConfigMap FieldMap = {{EField::Hostname, "hostname"}, {EField::Ssid, "ssid"},
+                             {EField::Password, "password"}, {EField::UdpLogger, "udplogger"},
+                             {EField::Preset1, "preset1"},   {EField::Preset2, "preset2"},
+                             {EField::Preset3, "preset3"},   {EField::Preset4, "preset4"}};
+
+TConfigMap ConfigMap;
+
+string ToString(EField field)
 {
-  memset(&config, 0, sizeof(config));
-  strncpy(config.Hostname, "Arduino", 40);
-  strncpy(config.Ssid, "", sizeof(config.Ssid));
-  strncpy(config.Password, "", sizeof(config.Password));
-  return Save();
+  for (auto& i : FieldMap)
+  {
+    if (i.first == field)
+      return i.second;
+  }
+  return "";
+}
+
+EField ToField(const string& field)
+{
+  for (auto& i : FieldMap)
+  {
+    if (i.second == field)
+      return i.first;
+  }
+  return EField::Illegal;
+}
+
+string GetHostname()
+{
+  return ConfigMap[EField::Hostname];
+}
+
+void SetHostname(const string& hostname)
+{
+  if (hostname.length() == 0)
+    Log::Error("Hostname cannot be empty.");
+  else
+    ConfigMap[EField::Hostname] = hostname;
+}
+
+string GetSsid()
+{
+  return ConfigMap[EField::Ssid];
+}
+
+void SetSsid(const string& ssid)
+{
+  ConfigMap[EField::Ssid] = ssid;
+}
+
+string GetPassword()
+{
+  return ConfigMap[EField::Password];
+}
+
+void SetPassword(const string& password)
+{
+  ConfigMap[EField::Password] = password;
+}
+
+SSocketAddress GetUdpLogger()
+{
+  SSocketAddress sa;
+  ToSocketAddress(ConfigMap[EField::UdpLogger], sa);
+  return sa;
+}
+
+void SetUdpLogger(const SSocketAddress& logger)
+{
+  ConfigMap[EField::UdpLogger] = ToString(logger);
+}
+
+EField GetPresetIndex(uint8_t index)
+{
+  if (index == 1)
+    return EField::Preset1;
+
+  if (index == 2)
+    return EField::Preset2;
+
+  if (index == 3)
+    return EField::Preset3;
+
+  if (index == 4)
+    return EField::Preset4;
+
+  Log::Error("Value for preset is out of range.");
+  return EField::Illegal;
+}
+
+double GetPreset(uint8_t index)
+{
+  EField field = GetPresetIndex(index);
+
+  if (field == EField::Illegal)
+    return 0;
+
+  return atof(ConfigMap[field].c_str());
+}
+
+void SetPreset(uint8_t index, double value)
+{
+  EField field = GetPresetIndex(index);
+
+  if (field == EField::Illegal)
+    return;
+
+  ConfigMap[field] = fmt::format("{}", value);
+}
+
+void Reset()
+{
+  ConfigMap.clear();
+  SetHostname("Arduino");
+
+  // TODO: Remove lines below
+  // SetUdpLogger({{10, 0, 0, 30}, 5001});
+  // SetSsid("join");
+  // SetPassword("iNFQLWsm7LJRYV8T");
+}
+
+void ParseConfiguration(const string& content)
+{
+  CParser parser;
+  parser.Init(content);
+  while (!parser.Ready())
+  {
+    parser.Until("=");
+    string name;
+    parser.SubStr(name);
+    parser.Skip();
+    parser.Until("\r\n");
+    string value;
+    parser.SubStr(value);
+    auto field = ToField(name);
+    if (field == EField::Illegal)
+    {
+      Log::Warning("Ignoring illegal configuration parameter: {}={}", name, value);
+    }
+    else
+    {
+      Log::Info("{}={}", name, value);
+      ConfigMap[field] = value;
+    }
+    parser.While("\r\n");
+  }
 }
 
 bool Load()
 {
   Log::Info("Loading configuration...");
 
-  memset(&config, 0, sizeof(config));
+  Reset();
 
-  auto file = WiFiStorage.open(CONFIG_FILE);
+  auto file = WiFiStorage.open(ConfigFile.c_str());
   if (!file)
   {
-    Log::Error("Config file could not be opened: {}", CONFIG_FILE);
+    Log::Warning("Config file could not be opened, reverting to defaults.");
     return false;
   }
 
-  Log::Info("Reading configuration...");
+  string content;
 
-  file.seek(0);
-  auto todo = sizeof(config);
-  auto amount = file.read(&config, sizeof(config));
-  file.close();
+  char buffer[100];
 
-  if (amount != todo)
+  while (file.available())
   {
-    Log::Warning("Config file has wrong size. Resetting to defaults...");
-    return Reset();
+    auto amount = file.read(buffer, sizeof(buffer));
+    content.append(buffer, amount);
   }
 
+  Log::Info("{} bytes read.", content.size());
+  ParseConfiguration(content);
   return true;
 }
 
 bool Save()
 {
   Log::Info("Saving configuration...");
-  auto file = WiFiStorage.open(CONFIG_FILE);
+
+  string content;
+  for (auto& i : ConfigMap)
+    content.append(fmt::format("{}={}\n", ToString(i.first), i.second));
+
+  auto file = WiFiStorage.open(ConfigFile.c_str());
   file.erase();
 
-  auto todo = sizeof(config);
-  auto amount = file.write(&config, todo);
-
-  if (amount != todo)
+  auto amount = file.write(content.data(), content.size());
+  if (amount != content.size())
   {
+    Log::Error("Unable to write configuration file.");
     file.erase();
     return false;
   }
-
   file.close();
+
+  Log::Info("{} bytes written", content.size());
   return true;
-}
-
-std::string GetHostName()
-{
-  return config.Hostname;
-}
-
-bool SetHostName(const string& hostname)
-{
-  if (hostname.length() == 0)
-    return false;
-
-  strncpy(config.Hostname, hostname.c_str(), sizeof(config.Hostname));
-  return true;
-}
-
-std::string GetWifiSSID()
-{
-  return config.Ssid;
-}
-
-bool SetWifiSSID(const string& ssid)
-{
-  if (ssid.length() == 0)
-    return false;
-
-  strncpy(config.Ssid, ssid.c_str(), sizeof(config.Ssid));
-  return true;
-}
-
-std::string GetWifiPassword()
-{
-  return config.Password;
-}
-
-void SetWifiPassword(const string& password)
-{
-  strncpy(config.Password, password.c_str(), sizeof(config.Password));
-}
-
-double GetPreset(uint8_t index)
-{
-  double value = index;
-  value *= 20;
-  return value;
 }
 
 } // namespace Config
