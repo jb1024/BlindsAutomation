@@ -29,7 +29,6 @@ void UnregisterLogger(ILogger& logger);
 void Log(ESeverity severity, const std::string& message);
 
 // Convenience functions
-
 template <typename... Args> static void Debug(const std::string& format, Args&&... args)
 {
   Log(ESeverity::Debug, fmt::format(format, std::forward<Args>(args)...));

@@ -7,14 +7,17 @@
 #include <stdint.h>
 #include <string>
 
+#include "Log.h"
 #include "Parser.h"
 #include "System.h"
 
-class CCommandInterface
+class CCommandInterface : public Log::ILogger
 {
 public:
   CCommandInterface(uint16_t port);
   ~CCommandInterface();
+
+  void OnLog(Log::ESeverity level, const std::string& msg) override;
 
   void Handler();
 
@@ -24,17 +27,18 @@ protected:
   WiFiServer mServer;
   WiFiClient mClient;
   std::string mReply;
+  bool mErrors = false;
+  bool mLogEnabled = false;
 
   std::string Parse();
   bool Help();
   bool Get();
-
   bool Set();
+
   bool SetPosition();
   bool SetPositionPreset();
   bool SetPositionRelative();
   bool SetPositionAbsolute();
-  bool SetHostName();
 
   bool ProcessCommand(const std::string& command);
 

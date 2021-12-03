@@ -7,7 +7,12 @@
 namespace Log
 {
 
+using std::set;
+using std::string;
+
 std::set<ILogger*> Loggers;
+uint32_t ErrorCount = 0;
+string LastError;
 
 void RegisterLogger(ILogger& logger)
 {
@@ -28,10 +33,16 @@ void Log(ESeverity severity, const std::string& message)
   for (auto& logger : Loggers)
     logger->OnLog(severity, message);
 
+  if (severity == ESeverity::Error)
+  {
+    LastError = message;
+    ErrorCount++;
+  }
+
   if (severity == ESeverity::Fatal)
     while (1)
     {
-      // Stop process. In case watchdog is enabled, system will be rebooted
+      // Stop process.
     };
 }
 

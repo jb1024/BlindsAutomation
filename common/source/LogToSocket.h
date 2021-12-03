@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Log.h"
+#include "Socket.h"
 
 class CLogToSocket : public Log::ILogger
 {
@@ -11,7 +12,7 @@ public:
   CLogToSocket();
   virtual ~CLogToSocket();
 
-  void Enable(IPAddress ip, uint16_t port);
+  void Enable(const SSocketAddress& sa);
 
   void OnLog(Log::ESeverity level, const std::string& msg) override;
 

@@ -2,30 +2,27 @@
 
 #include <string>
 
+#include "Socket.h"
+
 namespace Config
 {
 
-bool Reset();
 bool Load();
 bool Save();
 
-enum EConfigField
-{
-  HOSTNAME,
-};
+std::string GetHostname();
+void SetHostname(const std::string& hostname);
 
-std::string GetString(EConfigField field);
+std::string GetSsid();
+void SetSsid(const std::string& ssid);
 
-std::string GetHostName();
-bool SetHostName(const std::string& hostName);
+std::string GetPassword();
+void SetPassword(const std::string& password);
 
-std::string GetWifiSSID();
-bool SetWifiSSID(const std::string& ssid);
-
-std::string GetWifiPassword();
-void SetWifiPassword(const std::string& password);
+SSocketAddress GetUdpLogger();
+void SetUdpLogger(const SSocketAddress& logger);
 
 double GetPreset(uint8_t index);
-void SetPreset(uint8_t index);
+void SetPreset(uint8_t index, double value);
 
 } // namespace Config

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Axis.h"
+#include "Config.h"
 #include "Leds.h"
 #include "LogToConsole.h"
 #include "LogToSocket.h"
@@ -13,8 +14,10 @@ public:
   void Initialize();
   void Handler();
 
+  // System commands:
   void Reboot();
 
+  // Interfaces:
   CLeds& GetLeds();
   CAxis& GetAxis();
 
@@ -24,11 +27,10 @@ protected:
 
   CLogToConsole mLogToConsole;
   CLogToSocket mLogToSocket;
+
   CLeds mLeds;
   CAxis mAxis;
 
   bool ConnectToWifi();
   bool CreateAccessPoint();
-
-  // CCords mCords;
 };
