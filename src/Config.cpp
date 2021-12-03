@@ -138,17 +138,6 @@ void SetPreset(uint8_t index, double value)
   ConfigMap[field] = fmt::format("{}", value);
 }
 
-void Reset()
-{
-  ConfigMap.clear();
-  SetHostname("Arduino");
-
-  // TODO: Remove lines below
-  // SetUdpLogger({{10, 0, 0, 30}, 5001});
-  // SetSsid("join");
-  // SetPassword("iNFQLWsm7LJRYV8T");
-}
-
 void ParseConfiguration(const string& content)
 {
   CParser parser;
@@ -174,6 +163,12 @@ void ParseConfiguration(const string& content)
     }
     parser.While("\r\n");
   }
+}
+
+void Reset()
+{
+  ConfigMap.clear();
+  SetHostname("Arduino");
 }
 
 bool Load()

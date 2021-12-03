@@ -42,7 +42,7 @@ void Log(ESeverity severity, const std::string& message)
   if (severity == ESeverity::Fatal)
     while (1)
     {
-      // Stop process. In case watchdog is enabled, system will be rebooted
+      // Stop process.
     };
 }
 

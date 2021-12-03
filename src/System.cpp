@@ -27,9 +27,6 @@ bool CSystem::ConnectToWifi()
   auto ssid = Config::GetSsid();
   auto password = Config::GetPassword();
 
-  ssid = "join";
-  password = "iNFQLWsm7LJRYV8T";
-
   if (ssid.length() == 0)
   {
     Log::Warning("Could not connect to existing wifi network because SSID is not set.");
@@ -72,8 +69,6 @@ bool CSystem::CreateAccessPoint()
 
 void CSystem::Initialize()
 {
-  Config::Load();
-
   mLeds.SetDelay(500);
   mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
 
@@ -86,7 +81,7 @@ void CSystem::Initialize()
     return;
   }
 
-  if (!CreateAccessPoint())
+  if (CreateAccessPoint())
   {
     mLeds.SetSequence(ELedMode::Red, ELedMode::Off);
     return;
