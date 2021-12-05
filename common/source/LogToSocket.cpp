@@ -19,6 +19,7 @@ void CLogToSocket::Enable(const SSocketAddress& sa)
   {
     mSocket.begin(5001);
     Log::RegisterLogger(*this);
+    Log::Info("Logging to {}:{}", mIp, mPort);
   }
 }
 

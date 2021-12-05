@@ -264,7 +264,6 @@ void CCommandInterface::Handler()
 
   if (mClient)
   {
-    Log::Info("Client connected to command interface.");
     if (mClient.connected())
     {
       while (mClient.available())
