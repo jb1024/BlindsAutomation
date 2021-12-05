@@ -26,7 +26,7 @@ protected:
   double mSpeed = 10;
   double mCurrentPosition = 0;
   double mTargetPosition = 0;
-  bool mMoving = false;
+  bool mEnabled = false;
   double mTimer = 0;
 
   void SetPosition(double position);

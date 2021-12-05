@@ -63,54 +63,60 @@ void CAxis::MoveRelative(double movement)
 
 void CAxis::Enable()
 {
-  if (!mMoving)
+  if (!mEnabled)
   {
     Log::Debug("Axis enabled.");
     mServo.attach(mPin);
-    mMoving = true;
+    mEnabled = true;
   }
 }
 
 void CAxis::Disable()
 {
-  if (mMoving)
+  if (mEnabled)
   {
     delay(500);
     // Give axis minimum time to move
     Log::Debug("Axis disabled.");
     mServo.detach();
-    mMoving = false;
+    mEnabled = false;
   }
 }
 
 void CAxis::Handler()
 {
-  double now = millis();
-  double timespan = now - mTimer;
 
   if (mCurrentPosition == mTargetPosition)
   {
     Disable();
+    mTimer = millis();
     return;
   }
-  Enable();
+
+  if (mEnabled == false)
+  {
+    Enable();
+    mTimer = millis();
+    return;
+  }
+
+  double now = millis();
+  double timespan = now - mTimer;
+  mTimer = now;
 
   double movement = timespan * mSpeed / 1000;
-  if (movement > 0)
+  Log::Debug("Movement: {} in timespan {}", movement, timespan);
+  if (mTargetPosition > mCurrentPosition)
   {
-    mTimer = now;
-    if (mTargetPosition > mCurrentPosition)
-    {
-      mCurrentPosition += movement;
-      if (mCurrentPosition > mTargetPosition)
-        mCurrentPosition = mTargetPosition;
-    }
-    else
-    {
-      mCurrentPosition -= movement;
-      if (mCurrentPosition < mTargetPosition)
-        mCurrentPosition = mTargetPosition;
-    }
+    mCurrentPosition += movement;
+    if (mCurrentPosition > mTargetPosition)
+      mCurrentPosition = mTargetPosition;
+  }
+  else
+  {
+    mCurrentPosition -= movement;
+    if (mCurrentPosition < mTargetPosition)
+      mCurrentPosition = mTargetPosition;
   }
 
   int value = static_cast<int>(mCurrentPosition * 1.8);
