@@ -97,6 +97,7 @@ void CSystem::Initialize()
 void CSystem::Handler()
 {
   mLeds.Handler();
+  mAxis.Handler();
 }
 
 void CSystem::Reboot()

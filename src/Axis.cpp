@@ -6,12 +6,10 @@
 CAxis::CAxis(uint8_t pin)
     : mPin(pin)
 {
-  // mServo.attach(pin);
 }
 
 CAxis ::~CAxis()
 {
-  // mServo.detach();
 }
 
 void CAxis::SetSpeed(double speed)
@@ -43,46 +41,12 @@ void CAxis::SetPosition(double position)
     position = 100;
   }
 
-  mServo.attach(mPin);
-
-  double start = millis();
-  while (mPosition != position)
-  {
-    double now = millis();
-    double timespan = now - start;
-    Log::Debug("Timespan: {}", timespan);
-    double movement = timespan * mSpeed / 1000;
-
-    if (movement > 0)
-    {
-      Log::Debug("Movement: {}", movement);
-      start = now;
-
-      if (position < mPosition)
-      {
-        mPosition -= movement;
-        if (mPosition < position)
-          mPosition = position;
-      }
-      else
-      {
-        mPosition += movement;
-        if (mPosition > position)
-          mPosition = position;
-      }
-    }
-
-    int value = static_cast<int>(mPosition * 1.8);
-    mServo.write(value);
-  }
-
-  // Do we need to add additional time here?
-  mServo.detach();
+  mTargetPosition = position;
 }
 
 double CAxis::GetPosition()
 {
-  return mPosition;
+  return mCurrentPosition;
 }
 
 void CAxis::MoveAbsolute(double position)
@@ -94,5 +58,61 @@ void CAxis::MoveAbsolute(double position)
 void CAxis::MoveRelative(double movement)
 {
   Log::Info("Move relative: {}", movement);
-  SetPosition(mPosition + movement);
+  SetPosition(mTargetPosition + movement);
+}
+
+void CAxis::Enable()
+{
+  if (!mMoving)
+  {
+    Log::Debug("Axis enabled.");
+    mServo.attach(mPin);
+    mMoving = true;
+  }
+}
+
+void CAxis::Disable()
+{
+  if (mMoving)
+  {
+    delay(500);
+    // Give axis minimum time to move
+    Log::Debug("Axis disabled.");
+    mServo.detach();
+    mMoving = false;
+  }
+}
+
+void CAxis::Handler()
+{
+  double now = millis();
+  double timespan = now - mTimer;
+
+  if (mCurrentPosition == mTargetPosition)
+  {
+    Disable();
+    return;
+  }
+  Enable();
+
+  double movement = timespan * mSpeed / 1000;
+  if (movement > 0)
+  {
+    mTimer = now;
+    if (mTargetPosition > mCurrentPosition)
+    {
+      mCurrentPosition += movement;
+      if (mCurrentPosition > mTargetPosition)
+        mCurrentPosition = mTargetPosition;
+    }
+    else
+    {
+      mCurrentPosition -= movement;
+      if (mCurrentPosition < mTargetPosition)
+        mCurrentPosition = mTargetPosition;
+    }
+  }
+
+  int value = static_cast<int>(mCurrentPosition * 1.8);
+  mServo.write(value);
 }
