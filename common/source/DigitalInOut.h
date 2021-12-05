@@ -2,11 +2,20 @@
 
 #include <Arduino.h>
 
+enum class EPullMode
+{
+  Off,
+  Up,
+  Down
+};
+
 class CDigitalInOut
 {
 public:
   CDigitalInOut(uint32_t pin);
   ~CDigitalInOut();
+
+  void SetPullMode(EPullMode mode);
 
   void Set(bool value);
   bool Get();

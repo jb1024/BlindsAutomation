@@ -5,16 +5,31 @@ CDigitalInOut::CDigitalInOut(uint32_t pin)
   mPort = g_APinDescription[pin].ulPort;
   mPin = g_APinDescription[pin].ulPin;
   mPinMask = (1ul << mPin);
-
-  // Make input, enable pull, pull to gnd
-  PORT->Group[mPort].PINCFG[mPin].reg = (uint8_t)(PORT_PINCFG_INEN | PORT_PINCFG_PULLEN);
-  PORT->Group[mPort].DIRCLR.reg = mPinMask;
-  PORT->Group[mPort].OUTCLR.reg = mPinMask;
-  mIsOutput = false;
 }
 
 CDigitalInOut::~CDigitalInOut()
 {
+}
+
+void CDigitalInOut::SetPullMode(EPullMode mode)
+{
+  uint8_t mask = (uint8_t)PORT_PINCFG_PULLEN;
+  auto& pullreg = PORT->Group[mPort].PINCFG[mPin].reg;
+
+  switch (mode)
+  {
+  case EPullMode::Off:
+    pullreg &= ~mask;
+    break;
+  case EPullMode::Up:
+    pullreg |= mask;
+    PORT->Group[mPort].OUTSET.reg |= mPinMask;
+    break;
+  case EPullMode::Down:
+    pullreg |= mask;
+    PORT->Group[mPort].OUTCLR.reg = mPinMask;
+    break;
+  }
 }
 
 void CDigitalInOut::Set(bool value)
