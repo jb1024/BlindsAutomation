@@ -44,7 +44,6 @@ bool CSystem::ConnectToWifi()
 
   mLogToSocket.Enable(Config::GetUdpLogger());
 
-  // Config::GetUDPLoggerIp();
   auto ip = WiFi.localIP();
   Log::Info("Succesfully connected to wifi network.");
   Log::Info("IP: {}.{}.{}.{}", ip[0], ip[1], ip[2], ip[3]);
@@ -69,6 +68,8 @@ bool CSystem::CreateAccessPoint()
 
 void CSystem::Initialize()
 {
+  Config::Load();
+
   mLeds.SetDelay(500);
   mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
 
