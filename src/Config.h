@@ -22,6 +22,9 @@ void SetPassword(const std::string& password);
 SSocketAddress GetUdpLogger();
 void SetUdpLogger(const SSocketAddress& logger);
 
+double GetSpeed();
+void SetSpeed(double value);
+
 double GetPreset(uint8_t index);
 void SetPreset(uint8_t index, double value);
 

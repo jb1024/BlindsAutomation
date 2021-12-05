@@ -20,6 +20,7 @@ enum class EField
   Ssid,
   Password,
   UdpLogger,
+  Speed,
   Preset1,
   Preset2,
   Preset3,
@@ -28,10 +29,10 @@ enum class EField
 
 using TConfigMap = std::map<EField, string>;
 
-const TConfigMap FieldMap = {{EField::Hostname, "hostname"}, {EField::Ssid, "ssid"},
-                             {EField::Password, "password"}, {EField::UdpLogger, "udplogger"},
-                             {EField::Preset1, "preset1"},   {EField::Preset2, "preset2"},
-                             {EField::Preset3, "preset3"},   {EField::Preset4, "preset4"}};
+const TConfigMap FieldMap = {
+    {EField::Hostname, "hostname"},   {EField::Ssid, "ssid"},       {EField::Password, "password"},
+    {EField::UdpLogger, "udplogger"}, {EField::Speed, "speed"},     {EField::Preset1, "preset1"},
+    {EField::Preset2, "preset2"},     {EField::Preset3, "preset3"}, {EField::Preset4, "preset4"}};
 
 TConfigMap ConfigMap;
 
@@ -118,6 +119,16 @@ EField GetPresetIndex(uint8_t index)
   return EField::Illegal;
 }
 
+double GetSpeed()
+{
+  return atof(ConfigMap[EField::Speed].c_str());
+}
+
+void SetSpeed(double value)
+{
+  ConfigMap[EField::Speed] = fmt::format("{}", value);
+}
+
 double GetPreset(uint8_t index)
 {
   EField field = GetPresetIndex(index);
@@ -158,7 +169,6 @@ void ParseConfiguration(const string& content)
     }
     else
     {
-      Log::Info("{}={}", name, value);
       ConfigMap[field] = value;
     }
     parser.While("\r\n");
@@ -219,7 +229,7 @@ bool Save()
   }
   file.close();
 
-  Log::Info("{} bytes written", content.size());
+  Log::Info("{} bytes written.", content.size());
   return true;
 }
 

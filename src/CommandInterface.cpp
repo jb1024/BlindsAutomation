@@ -93,31 +93,44 @@ bool CCommandInterface::SetPositionAbsolute()
   return true;
 }
 
-bool CCommandInterface::Help()
+bool CCommandInterface::ShowHelp()
 {
-  mReply.append("-------------------\n");
-  mReply.append("help               : Shows this text.\n");
-  mReply.append("reboot             : Reboots the system.\n");
-  mReply.append("set pos [value]    : Sets the position of the axis.\n");
-  mReply.append("                     0 .. 100 move to absolute position in percentage of the total stroke.\n");
-  mReply.append("                     -100 .. +100 move relative in percentage of the total stroke.\n");
-  mReply.append("                     p1 .. p4 move to preset position.\n");
-  mReply.append("set preset [value] : Sets the current position to specified preset.\n");
-  mReply.append("                     Valid range: 1 .. 4\n");
-  mReply.append("save               : Save configuration changes.\n");
-  mReply.append("\n");
+  mClient.write("reboot                : Reboots the system.\n");
+
+  mClient.write("set hostname [value]  : Sets the device hostname name for wifi network.\n");
+  mClient.write("                        In accesspoint mode the hostname is used as ssid.\n");
+  mClient.write("get hostname          : Gets the device hostname.\n\n");
+
+  mClient.write("set ssid [value]      : Sets name of the wifi network to connect with.\n");
+  mClient.write("get ssid              : Gets name of the wifi network to connect with.\n");
+  mClient.write("set password [value]  : Sets the password for the wifi network specified with ssid.\n\n");
+
+  mClient.write("set udplogger [value] : Sets the socket address for udp logging.\n");
+  mClient.write("                        Format is [ip]:[port]. For example: 10.0.0.30:5000.\n");
+  mClient.write("                        UDP logging is disabled when the specified port is 0.\n");
+  mClient.write("get udplogger         : Gets the socket address of the udp logger.\n\n");
+
+  mClient.write("set speed [value]     : Sets maximum axis speed in degrees per second.\n");
+  mClient.write("                        Minimum value = 1\n");
+  mClient.write("get speed             : Gets the maximum axis speed in degrees per second.\n");
+
+  mClient.write("set preset [value]    : Sets the specified preset to the current position.\n");
+  mClient.write("                        Valid range: 1 .. 4\n");
+  mClient.write("get preset            : Gets the position for the specified preset.\n");
+
+  mClient.write("set pos [value]       : Sets the position of the axis.\n");
+  mClient.write("                        0 .. 100 move to absolute position in percentage of the total stroke.\n");
+  mClient.write("                        -100 .. +100 move relative in percentage of the total stroke.\n");
+  mClient.write("                        p1 .. p4 move to preset position.\n");
+  mClient.write("get pos               : Gets the current position of the axis.\n");
+
+  mClient.write("save                  : Save configuration changes.\n\n");
   return true;
 }
 
 bool CCommandInterface::Get()
 {
   auto txt = Parse();
-
-  if (txt == "pos")
-  {
-    mReply = fmt::format("{}", GetAxis().GetPosition());
-    return true;
-  }
 
   if (txt == "hostname")
   {
@@ -137,11 +150,23 @@ bool CCommandInterface::Get()
     return true;
   }
 
+  if (txt == "speed")
+  {
+    mReply = fmt::format("{}", Config::GetSpeed());
+    return true;
+  }
+
   if (txt == "preset")
   {
     auto index = atoi(Parse().c_str());
     auto pos = Config::GetPreset(index);
     mReply = fmt::format("{}", pos);
+    return true;
+  }
+
+  if (txt == "pos")
+  {
+    mReply = fmt::format("{}", GetAxis().GetPosition());
     return true;
   }
 
@@ -152,9 +177,6 @@ bool CCommandInterface::Get()
 bool CCommandInterface::Set()
 {
   auto txt = Parse();
-
-  if (txt == "pos")
-    return SetPosition();
 
   if (txt == "hostname")
   {
@@ -168,11 +190,23 @@ bool CCommandInterface::Set()
     return true;
   }
 
+  if (txt == "password")
+  {
+    Config::SetPassword(Parse());
+    return true;
+  }
+
   if (txt == "udplogger")
   {
     SSocketAddress sa;
     if (ToSocketAddress(Parse(), sa))
       Config::SetUdpLogger(sa);
+    return true;
+  }
+
+  if (txt == "speed")
+  {
+    Config::SetSpeed(atof(Parse().c_str()));
     return true;
   }
 
@@ -184,32 +218,31 @@ bool CCommandInterface::Set()
     return true;
   }
 
+  if (txt == "pos")
+    return SetPosition();
+
   Log::Error("Unexpected keyword: '{}'", txt);
   return false;
 }
 
 bool CCommandInterface::ProcessCommand(const string& command)
 {
-  mParser.Init(command);
+  mReply.clear();
+  mErrors = false;
 
-  auto cmd = Parse();
-
-  if (cmd == "help")
-    return Help();
-
-  if (cmd == "reboot")
+  if (command == "reboot")
     CSystem::Get().Reboot();
 
-  if (cmd == "set")
+  if (command == "set")
     return Set();
 
-  if (cmd == "get")
+  if (command == "get")
     return Get();
 
-  if (cmd == "load")
+  if (command == "load")
     return Config::Load();
 
-  if (cmd == "save")
+  if (command == "save")
     return Config::Save();
 
   Log::Error("Illegal command: {}", command);
@@ -231,29 +264,37 @@ void CCommandInterface::Handler()
 
   if (mClient)
   {
+    Log::Info("Client connected to command interface.");
     if (mClient.connected())
     {
       while (mClient.available())
       {
         buffer += mClient.read();
       }
-      Log::Info("Command received: {}", buffer);
 
-      mReply.clear();
-      mErrors = false;
+      mParser.Init(buffer);
+      auto command = Parse();
 
-      if (!ProcessCommand(buffer))
-        mErrors = true;
-
-      if (mErrors)
-        mClient.write("NOK\n");
-      else
-        mClient.write("OK\n");
-
-      if (mReply.size() > 0)
+      if (command.length() == 0)
       {
-        mClient.write(mReply.c_str());
-        mClient.write("\n");
+        ShowHelp();
+      }
+      else
+      {
+        Log::Info("Command received: {}", buffer);
+
+        ProcessCommand(command);
+
+        if (mErrors)
+          mClient.write("NOK\n");
+        else
+          mClient.write("OK\n");
+
+        if (mReply.size() > 0)
+        {
+          mClient.write(mReply.c_str());
+          mClient.write("\n");
+        }
       }
       mClient.write("> ");
     }

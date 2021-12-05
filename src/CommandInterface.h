@@ -28,10 +28,11 @@ protected:
   WiFiClient mClient;
   std::string mReply;
   bool mErrors = false;
-  bool mLogEnabled = false;
+  // bool mLogEnabled = false;
+  bool mConnected = false;
 
   std::string Parse();
-  bool Help();
+  bool ShowHelp();
   bool Get();
   bool Set();
 
