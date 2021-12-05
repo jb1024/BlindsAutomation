@@ -206,7 +206,9 @@ bool CCommandInterface::Set()
 
   if (txt == "speed")
   {
-    Config::SetSpeed(atof(Parse().c_str()));
+    double speed = atof(Parse().c_str());
+    CSystem::Get().GetAxis().SetSpeed(speed);
+    Config::SetSpeed(speed);
     return true;
   }
 

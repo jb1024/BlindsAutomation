@@ -70,6 +70,8 @@ void CSystem::Initialize()
 {
   Config::Load();
 
+  mAxis.SetSpeed(Config::GetSpeed());
+
   mLeds.SetDelay(500);
   mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
 
