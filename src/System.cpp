@@ -15,7 +15,9 @@ CSystem& CSystem::Get()
 CSystem::CSystem()
     : mLeds(3, 5)
     , mAxis(12)
+    , mCords(7, 8)
 {
+  mCords.SetAction(ECordsAction::BothHeld, [&]() { Reboot(); });
 }
 
 CSystem::~CSystem()
@@ -98,6 +100,7 @@ void CSystem::Handler()
 {
   mLeds.Handler();
   mAxis.Handler();
+  mCords.Handler();
 }
 
 void CSystem::Reboot()

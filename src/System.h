@@ -2,6 +2,7 @@
 
 #include "Axis.h"
 #include "Config.h"
+#include "Cords.h"
 #include "Leds.h"
 #include "LogToConsole.h"
 #include "LogToSocket.h"
@@ -30,6 +31,7 @@ protected:
 
   CLeds mLeds;
   CAxis mAxis;
+  CCords mCords;
 
   bool ConnectToWifi();
   bool CreateAccessPoint();
