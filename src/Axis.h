@@ -18,6 +18,9 @@ public:
   void MoveAbsolute(double position); // 0 .. 100%
   void MoveRelative(double movement); // +/- 0 .. 100%
 
+  void Move1();
+  void Move2();
+
   double GetPosition();
 
 protected:

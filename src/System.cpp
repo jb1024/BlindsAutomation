@@ -17,7 +17,34 @@ CSystem::CSystem()
     , mAxis(12)
     , mCords(7, 8)
 {
-  mCords.SetAction(ECordsAction::BothHeld, [&]() { Reboot(); });
+  mCords.SetAction(ECordsAction::Cx_Held, [&]() { Reboot(); });
+  mCords.SetAction(ECordsAction::C1_Held, [&]() { mAxis.Move1(); });
+  mCords.SetAction(ECordsAction::C2_Held, [&]() { mAxis.Move2(); });
+
+  // Set preset 1 if cord 1 or 2 is pulled once
+  {
+    auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(1)); };
+    mCords.SetAction(ECordsAction::C1_Pull1, f);
+    mCords.SetAction(ECordsAction::C2_Pull1, f);
+  }
+
+  {
+    auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(2)); };
+    mCords.SetAction(ECordsAction::C1_Pull2, f);
+    mCords.SetAction(ECordsAction::C2_Pull2, f);
+  }
+
+  {
+    auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(3)); };
+    mCords.SetAction(ECordsAction::C1_Pull3, f);
+    mCords.SetAction(ECordsAction::C2_Pull3, f);
+  }
+
+  {
+    auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(4)); };
+    mCords.SetAction(ECordsAction::C1_Pull4, f);
+    mCords.SetAction(ECordsAction::C2_Pull4, f);
+  }
 }
 
 CSystem::~CSystem()

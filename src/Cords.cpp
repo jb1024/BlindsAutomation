@@ -11,8 +11,48 @@ CCords::~CCords()
 {
 }
 
-void CCords::RunAction(ECordsAction action)
+ECordsAction CCords::GetAction()
 {
+  uint8_t pulls1 = mCord1.GetNumberOfPulls();
+  uint8_t pulls2 = mCord2.GetNumberOfPulls();
+  bool held1 = mCord1.IsHeld();
+  bool held2 = mCord2.IsHeld();
+
+  if (held1 && held2)
+    return ECordsAction::Cx_Held;
+  if (held1)
+    return ECordsAction::C1_Held;
+  if (held2)
+    return ECordsAction::C2_Held;
+
+  if (pulls1 == 1)
+    return ECordsAction::C1_Pull1;
+  if (pulls1 == 2)
+    return ECordsAction::C1_Pull2;
+  if (pulls1 == 3)
+    return ECordsAction::C1_Pull3;
+  if (pulls1 == 4)
+    return ECordsAction::C1_Pull4;
+
+  if (pulls2 == 1)
+    return ECordsAction::C2_Pull1;
+  if (pulls2 == 2)
+    return ECordsAction::C2_Pull2;
+  if (pulls2 == 3)
+    return ECordsAction::C2_Pull3;
+  if (pulls2 == 4)
+    return ECordsAction::C2_Pull4;
+
+  return ECordsAction::None;
+}
+
+void CCords::RunAction()
+{
+  auto action = GetAction();
+
+  if (action == ECordsAction::None)
+    return;
+
   if (mActionMap.find(action) == mActionMap.end())
   {
     Log::Debug("No action defined for {}", action);
@@ -26,9 +66,7 @@ void CCords::Handler()
 {
   mCord1.Handler();
   mCord2.Handler();
-
-  if (mCord1.IsHeld() && mCord2.IsHeld())
-    RunAction(ECordsAction::BothHeld);
+  RunAction();
 }
 
 void CCords::SetAction(ECordsAction action, const ActionFunction func)

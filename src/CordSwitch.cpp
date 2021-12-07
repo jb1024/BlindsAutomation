@@ -6,7 +6,6 @@ CCordSwitch::CCordSwitch(uint8_t pin)
 {
   // Enable pullup because pin is switched to GND
   mDio.SetPullMode(EPullMode::Up);
-  mTimeStamp = millis();
 }
 
 CCordSwitch::~CCordSwitch()
@@ -27,15 +26,13 @@ void CCordSwitch::Sample()
     if (mStableCount++ > 15)
     {
       mCurrentValue = value;
-      mTimeStamp = millis();
+      mTimer.Reset();
     }
   }
 }
 
 ECordState CCordSwitch::GetNextState()
 {
-  uint32_t period = millis() - mTimeStamp;
-
   if (mState == ECordState::Idle)
   {
     mPullCount = 0;
@@ -50,7 +47,7 @@ ECordState CCordSwitch::GetNextState()
       mPullCount++;
       return ECordState::Released;
     }
-    if (period > 500)
+    if (mTimer.TimeOut(500))
       return ECordState::Held;
   }
 
@@ -58,7 +55,7 @@ ECordState CCordSwitch::GetNextState()
   {
     if (mCurrentValue)
       return ECordState::Pulled;
-    if (period > 500)
+    if (mTimer.TimeOut(500))
     {
       mFinalPullCount = mPullCount;
       return ECordState::Idle;

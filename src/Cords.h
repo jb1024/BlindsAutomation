@@ -6,12 +6,32 @@
 
 #include "CordSwitch.h"
 
+// C1_Held
+// C2_Held
+// Cx_Held
+// C1_Pull1
+// C1_Pull2
+// C1_Pull3
+// C1_Pull4
+// C2_Pull1
+// C2_Pull2
+// C2_Pull3
+// C2_Pull4
+
 enum class ECordsAction
 {
   None,
-  BothHeld,
-  Held1,
-  Held2
+  C1_Pull1,
+  C2_Pull1,
+  C1_Pull2,
+  C2_Pull2,
+  C1_Pull3,
+  C2_Pull3,
+  C1_Pull4,
+  C2_Pull4,
+  C1_Held,
+  C2_Held,
+  Cx_Held
 };
 
 class CCords
@@ -31,5 +51,6 @@ protected:
   CCordSwitch mCord2;
   std::map<ECordsAction, ActionFunction> mActionMap;
 
-  void RunAction(ECordsAction action);
+  ECordsAction GetAction();
+  void RunAction();
 };

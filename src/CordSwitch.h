@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DigitalInOut.h"
+#include "Timer.h"
 
 enum class ECordState
 {
@@ -23,9 +24,9 @@ public:
 
 protected:
   CDigitalInOut mDio;
+  CTimer mTimer;
   uint32_t mStableCount;
   bool mCurrentValue = false;
-  uint32_t mTimeStamp;
   ECordState mState = ECordState::Idle;
   uint32_t mPullCount = 0;
   uint32_t mFinalPullCount = 0;

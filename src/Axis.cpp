@@ -61,6 +61,16 @@ void CAxis::MoveRelative(double movement)
   SetPosition(mTargetPosition + movement);
 }
 
+void CAxis::Move1()
+{
+  MoveRelative(-0.1);
+}
+
+void CAxis::Move2()
+{
+  MoveRelative(0.1);
+}
+
 void CAxis::Enable()
 {
   if (!mEnabled)
@@ -105,7 +115,7 @@ void CAxis::Handler()
   mTimer = now;
 
   double movement = timespan * mSpeed / 1000;
-  Log::Debug("Movement: {} in timespan {}", movement, timespan);
+  // Log::Debug("Movement: {} in timespan {}", movement, timespan);
   if (mTargetPosition > mCurrentPosition)
   {
     mCurrentPosition += movement;
