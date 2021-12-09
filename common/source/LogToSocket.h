@@ -20,4 +20,7 @@ protected:
   WiFiUDP mSocket;
   std::string mIp;
   uint16_t mPort;
+
+  std::string GetSeverityString(Log::ESeverity level);
+  std::string GetSeverityColor(Log::ESeverity level);
 };

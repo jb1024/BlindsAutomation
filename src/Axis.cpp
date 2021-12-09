@@ -31,13 +31,13 @@ void CAxis::SetPosition(double position)
 {
   if (position < 0)
   {
-    Log::Warning("Position clipped {} => 0.0", position);
+    Log::Debug("Position clipped {} => 0.0", position);
     position = 0;
   }
 
   if (position > 100)
   {
-    Log::Warning("Position clipped {} => 100.0", position);
+    Log::Debug("Position clipped {} => 100.0", position);
     position = 100;
   }
 

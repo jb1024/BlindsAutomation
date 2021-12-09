@@ -2,6 +2,8 @@
 
 #include "Log.h"
 
+using std::string;
+
 CLogToSocket::CLogToSocket()
 {
 }
@@ -23,10 +25,44 @@ void CLogToSocket::Enable(const SSocketAddress& sa)
   }
 }
 
+string CLogToSocket::GetSeverityString(Log::ESeverity level)
+{
+  if (level == Log::ESeverity::Debug)
+    return "";
+  if (level == Log::ESeverity::Info)
+    return "";
+  if (level == Log::ESeverity::Warning)
+    return "Warning: ";
+  if (level == Log::ESeverity::Error)
+    return "Error: ";
+  if (level == Log::ESeverity::Fatal)
+    return "Fatal: ";
+  return "";
+}
+
+#define NO_COLOR = "\x1b\[0m"; // #Uncolored SERVER_COLOR = "\x1b\[31m" #Red
+
+string CLogToSocket::GetSeverityColor(Log::ESeverity level)
+{
+  if (level == Log::ESeverity::Debug)
+    return "\e[38;5;7m";
+  if (level == Log::ESeverity::Info)
+    return "\e[38;5;32m";
+  if (level == Log::ESeverity::Warning)
+    return "\e[38;5;208m";
+  if (level == Log::ESeverity::Error)
+    return "\e[38;5;196m";
+  if (level == Log::ESeverity::Fatal)
+    return "\e[48;5;196m";
+  return "";
+}
+
 void CLogToSocket::OnLog(Log::ESeverity level, const std::string& msg)
 {
+  string txt;
+  txt = fmt::format("{}{}{}\r{}\n", GetSeverityColor(level), GetSeverityString(level), msg, "\e[0m");
+
   mSocket.beginPacket(mIp.c_str(), mPort);
-  mSocket.write(msg.c_str());
-  mSocket.write("\r\n");
+  mSocket.write(txt.c_str());
   mSocket.endPacket();
 }
