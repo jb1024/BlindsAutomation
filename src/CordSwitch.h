@@ -25,7 +25,6 @@ public:
 protected:
   CDigitalInOut mDio;
   CTimer mTimer;
-  uint32_t mStableCount;
   bool mCurrentValue = false;
   ECordState mState = ECordState::Idle;
   uint32_t mPullCount = 0;
