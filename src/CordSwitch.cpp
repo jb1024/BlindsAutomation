@@ -16,18 +16,14 @@ void CCordSwitch::Sample()
 {
   bool value = !mDio.Get();
 
-  if (value == mCurrentValue)
+  // Ignore first 10 ms after state change to debounce
+  if (!mTimer.TimeOut(10))
+    return;
+
+  if (value != mCurrentValue)
   {
-    mStableCount = 0;
-  }
-  else
-  {
-    // Filter glitches on input
-    if (mStableCount++ > 15)
-    {
-      mCurrentValue = value;
-      mTimer.Reset();
-    }
+    mCurrentValue = value;
+    mTimer.Reset();
   }
 }
 
