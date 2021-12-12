@@ -2,11 +2,16 @@
 
 #include <Servo.h>
 
+#include <Pin.h>
+#include <Timer.h>
+
 class CAxis
 {
 public:
-  CAxis(uint8_t pin);
+  CAxis(const SPin& pin);
   ~CAxis();
+
+  void Initialize();
 
   // Should be called periodically
   // monitors the setpoint and adjusts the position regarding the speed
@@ -27,10 +32,10 @@ protected:
   uint8_t mPin;
   Servo mServo;
   double mSpeed = 10;
-  double mCurrentPosition = 0;
-  double mTargetPosition = 0;
+  double mCurrentPosition = 50;
+  double mTargetPosition = 50;
   bool mEnabled = false;
-  double mTimer = 0;
+  CTimer mTimer;
 
   void SetPosition(double position);
   void Enable();

@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Log.h"
+#include "PinAssignments.h"
 #include "System.h"
 
 CSystem& CSystem::Get()
@@ -13,9 +14,9 @@ CSystem& CSystem::Get()
 }
 
 CSystem::CSystem()
-    : mLeds(3, 5)
-    , mAxis(12)
-    , mCords(7, 8)
+    : mStatus({Pins.Led0, Pins.Led1, Pins.Led2})
+    , mAxis(Pins.Servo)
+    , mCords(Pins.Cord1, Pins.Cord2)
 {
   mCords.SetAction(ECordsAction::Cx_Held, [&]() { Reboot(); });
   mCords.SetAction(ECordsAction::C1_Held, [&]() { mAxis.Move1(); });
@@ -90,6 +91,7 @@ bool CSystem::CreateAccessPoint()
     return false;
   }
 
+  mStatus.SetAccessPoint(true);
   Log::Info("Access point created.");
   Log::Info("Goto http://10.0.0.1 for device configuration.");
   return true;
@@ -97,35 +99,27 @@ bool CSystem::CreateAccessPoint()
 
 void CSystem::Initialize()
 {
+  mStatus.SetBooting(true);
+
   Config::Load();
 
   mAxis.SetSpeed(Config::GetSpeed());
 
-  mLeds.SetDelay(500);
-  mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
-
   auto hostname = Config::GetHostname();
   WiFi.setHostname(hostname.c_str());
 
-  if (ConnectToWifi())
+  if (!ConnectToWifi())
   {
-    mLeds.SetSequence(ELedMode::Off, ELedMode::Off);
-    return;
+    if (!CreateAccessPoint())
+      Reboot();
   }
 
-  if (CreateAccessPoint())
-  {
-    mLeds.SetSequence(ELedMode::Red, ELedMode::Off);
-    return;
-  }
-
-  mLeds.SetSequence(ELedMode::Red, ELedMode::Red);
-  Reboot();
+  mStatus.SetBooting(false);
 }
 
 void CSystem::Handler()
 {
-  mLeds.Handler();
+  mStatus.Handler();
   mAxis.Handler();
   mCords.Handler();
 }
@@ -140,9 +134,9 @@ void CSystem::Reboot()
     ;
 }
 
-CLeds& CSystem::GetLeds()
+CStatus& CSystem::GetStatus()
 {
-  return mLeds;
+  return mStatus;
 }
 
 CAxis& CSystem::GetAxis()

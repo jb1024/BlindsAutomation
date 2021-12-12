@@ -1,7 +1,7 @@
 #include "CordSwitch.h"
 #include "Log.h"
 
-CCordSwitch::CCordSwitch(uint8_t pin)
+CCordSwitch::CCordSwitch(const SPin& pin)
     : mDio(pin)
 {
   // Enable pullup because pin is switched to GND
@@ -14,7 +14,7 @@ CCordSwitch::~CCordSwitch()
 
 void CCordSwitch::Sample()
 {
-  bool value = !mDio.Get();
+  bool value = mDio.Get();
 
   // Ignore first 10 ms after state change to debounce
   if (!mTimer.TimeOut(10))

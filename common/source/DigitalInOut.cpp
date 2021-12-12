@@ -1,10 +1,11 @@
 #include "DigitalInOut.h"
 
-CDigitalInOut::CDigitalInOut(uint32_t pin)
+CDigitalInOut::CDigitalInOut(const SPin& pin)
 {
-  mPort = g_APinDescription[pin].ulPort;
-  mPin = g_APinDescription[pin].ulPin;
+  mPort = g_APinDescription[pin.Pin].ulPort;
+  mPin = g_APinDescription[pin.Pin].ulPin;
   mPinMask = (1ul << mPin);
+  mInvert = pin.Invert;
 }
 
 CDigitalInOut::~CDigitalInOut()
@@ -40,6 +41,9 @@ void CDigitalInOut::Set(bool value)
     mIsOutput = true;
   }
 
+  if (mInvert)
+    value = !value;
+
   if (value)
     PORT->Group[mPort].OUTSET.reg = mPinMask;
   else
@@ -54,10 +58,16 @@ bool CDigitalInOut::Get()
     mIsOutput = false;
   }
 
+  bool result = false;
   if ((PORT->Group[mPort].IN.reg & mPinMask) != 0)
-    return true;
+    result = true;
   else
-    return false;
+    result = false;
+
+  if (!mInvert)
+    return result;
+  else
+    return !result;
 }
 
 void CDigitalInOut::operator=(bool value)

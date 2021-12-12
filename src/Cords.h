@@ -39,7 +39,7 @@ class CCords
   using ActionFunction = std::function<void()>;
 
 public:
-  CCords(uint8_t pin1, uint8_t pin2);
+  CCords(const SPin& pin1, const SPin& pin2);
   ~CCords();
 
   void Handler();

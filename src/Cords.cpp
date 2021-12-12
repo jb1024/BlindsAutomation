@@ -1,7 +1,7 @@
 #include "Cords.h"
 #include "System.h"
 
-CCords::CCords(uint8_t pin1, uint8_t pin2)
+CCords::CCords(const SPin& pin1, const SPin& pin2)
     : mCord1(pin1)
     , mCord2(pin2)
 {

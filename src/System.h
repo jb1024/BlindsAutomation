@@ -3,9 +3,9 @@
 #include "Axis.h"
 #include "Config.h"
 #include "Cords.h"
-#include "Leds.h"
 #include "LogToConsole.h"
 #include "LogToSocket.h"
+#include "Status.h"
 
 class CSystem
 {
@@ -19,7 +19,7 @@ public:
   void Reboot();
 
   // Interfaces:
-  CLeds& GetLeds();
+  CStatus& GetStatus();
   CAxis& GetAxis();
 
 protected:
@@ -29,7 +29,7 @@ protected:
   CLogToConsole mLogToConsole;
   CLogToSocket mLogToSocket;
 
-  CLeds mLeds;
+  CStatus mStatus;
   CAxis mAxis;
   CCords mCords;
 
