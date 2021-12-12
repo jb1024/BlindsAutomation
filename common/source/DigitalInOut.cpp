@@ -5,7 +5,7 @@ CDigitalInOut::CDigitalInOut(const SPin& pin)
   mPort = g_APinDescription[pin.Pin].ulPort;
   mPin = g_APinDescription[pin.Pin].ulPin;
   mPinMask = (1ul << mPin);
-  mInvert = pin.Invert;
+  mInvert = pin.Mode == EPinMode::Inverted;
 }
 
 CDigitalInOut::~CDigitalInOut()
