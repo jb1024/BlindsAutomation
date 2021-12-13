@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DigitalInOut.h"
+#include "Pin.h"
 #include "Timer.h"
 
 enum class ECordState
@@ -14,7 +15,7 @@ enum class ECordState
 class CCordSwitch
 {
 public:
-  CCordSwitch(uint8_t pin);
+  CCordSwitch(const SPin& pin);
   ~CCordSwitch();
 
   void Handler();

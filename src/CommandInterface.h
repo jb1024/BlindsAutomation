@@ -44,5 +44,5 @@ protected:
   bool ProcessCommand(const std::string& command);
 
   CAxis& GetAxis();
-  CLeds& GetLeds();
+  CStatus& GetStatus();
 };

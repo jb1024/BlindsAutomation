@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include <Pin.h>
+
 enum class EPullMode
 {
   Off,
@@ -12,7 +14,7 @@ enum class EPullMode
 class CDigitalInOut
 {
 public:
-  CDigitalInOut(uint32_t pin);
+  CDigitalInOut(const SPin& pin);
   ~CDigitalInOut();
 
   void SetPullMode(EPullMode mode);
@@ -23,6 +25,7 @@ public:
   void operator=(bool);
 
 protected:
+  bool mInvert;
   bool mIsOutput = false;
   EPortType mPort = PORTA;
   uint32_t mPin = 0;

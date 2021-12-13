@@ -1,15 +1,27 @@
 #include "Axis.h"
 #include "Log.h"
+#include "System.h"
+#include "Timer.h"
 
 #include <Arduino.h>
 
-CAxis::CAxis(uint8_t pin)
-    : mPin(pin)
+CAxis::CAxis(const SPin& pin)
+    : mPin(pin.Pin)
 {
 }
 
 CAxis ::~CAxis()
 {
+}
+
+void CAxis::Initialize()
+{
+  int value = static_cast<int>(mCurrentPosition * 1.8);
+  mServo.write(value);
+
+  Enable();
+  delay(500);
+  Disable();
 }
 
 void CAxis::SetSpeed(double speed)
@@ -78,6 +90,7 @@ void CAxis::Enable()
     Log::Debug("Axis enabled.");
     mServo.attach(mPin);
     mEnabled = true;
+    CSystem::Get().GetStatus().SetMoving(true);
   }
 }
 
@@ -90,29 +103,31 @@ void CAxis::Disable()
     Log::Debug("Axis disabled.");
     mServo.detach();
     mEnabled = false;
+    CSystem::Get().GetStatus().SetMoving(false);
   }
 }
 
 void CAxis::Handler()
 {
+  if (!mTimer.TimeOut(10))
+    return;
 
   if (mCurrentPosition == mTargetPosition)
   {
     Disable();
-    mTimer = millis();
+    mTimer.Reset();
     return;
   }
 
   if (mEnabled == false)
   {
     Enable();
-    mTimer = millis();
+    mTimer.Reset();
     return;
   }
 
-  double now = millis();
-  double timespan = now - mTimer;
-  mTimer = now;
+  auto timespan = mTimer.GetTime();
+  mTimer.Reset();
 
   double movement = timespan * mSpeed / 1000;
   // Log::Debug("Movement: {} in timespan {}", movement, timespan);

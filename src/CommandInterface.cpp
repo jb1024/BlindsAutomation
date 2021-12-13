@@ -30,9 +30,9 @@ CAxis& CCommandInterface::GetAxis()
   return CSystem::Get().GetAxis();
 }
 
-CLeds& CCommandInterface::GetLeds()
+CStatus& CCommandInterface::GetStatus()
 {
-  return CSystem::Get().GetLeds();
+  return CSystem::Get().GetStatus();
 }
 
 string CCommandInterface::Parse()
