@@ -25,20 +25,58 @@ void CStatus::SetBooting(bool enable)
 
 void CStatus::SetMoving(bool enable)
 {
-  mMoving = enable;
-  if (mMoving)
-    mRedLed.On();
-  else
-    mRedLed.Off();
+  if (!mOverrideLed1)
+  {
+    mMoving = enable;
+    if (mMoving)
+      mRedLed.On();
+    else
+      mRedLed.Off();
+  }
 }
 
 void CStatus::SetAccessPoint(bool enable)
 {
-  mAccessPoint = enable;
-  if (mAccessPoint)
-    mGreenLed.Blink(1000);
-  else
+  if (!mOverrideLed1)
+  {
+    mAccessPoint = enable;
+    if (mAccessPoint)
+      mGreenLed.Blink(1000);
+    else
+      mGreenLed.Off();
+  }
+}
+
+void CStatus::SetLed1Override(ELedOverride override)
+{
+  switch (override)
+  {
+  case ELedOverride::Release:
+    mRedLed.Off();
     mGreenLed.Off();
+    mOverrideLed1 = false; // Turn LED off and revert to normal status function
+    break;
+  case ELedOverride::ForceRed:
+    mOverrideLed1 = true;
+    mRedLed.On();
+    mGreenLed.Off();
+    break;
+  case ELedOverride::ForceGreen:
+    mOverrideLed1 = true;
+    mRedLed.Off();
+    mGreenLed.On();
+    break;
+  case ELedOverride::ForceRedGreen:
+    mOverrideLed1 = true;
+    mRedLed.On();
+    mGreenLed.On();
+    break;
+  case ELedOverride::ForceOff:
+    mRedLed.Off();
+    mGreenLed.Off();
+    mOverrideLed1 = true;
+    break;
+  }
 }
 
 void CStatus::Handler()

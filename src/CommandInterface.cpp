@@ -95,10 +95,14 @@ bool CCommandInterface::SetPositionAbsolute()
 
 bool CCommandInterface::ShowHelp()
 {
-  mClient.write("Version: 0.0.4        : just a version for now.\n");
+  mClient.write("Version: 0.0.5        : 0.0.5: Added LED override commands.\n");
+  mClient.write("                      : 0.0.4: Just a first version.\n\n");
 
-  mClient.write("reboot                : Reboots the system.\n");
+  mClient.write("reboot                : Reboots the system.\n\n");
 
+  // Config space related commands
+  mClient.write("load                  : Load configuration settings from storage.\n"); //@JB: Added the load command,
+                                                                                        // but not sure why it is here?
   mClient.write("set hostname [value]  : Sets the device hostname name for wifi network.\n");
   mClient.write("                        In accesspoint mode the hostname is used as ssid.\n");
   mClient.write("get hostname          : Gets the device hostname.\n\n");
@@ -118,15 +122,23 @@ bool CCommandInterface::ShowHelp()
 
   mClient.write("set preset [value]    : Sets the specified preset to the current position.\n");
   mClient.write("                        Valid range: 1 .. 4\n");
-  mClient.write("get preset            : Gets the position for the specified preset.\n");
+  mClient.write("get preset            : Gets the position for the specified preset.\n\n");
+
+  mClient.write("save                  : Save configuration changes.\n\n");
+  // end config space related commands
 
   mClient.write("set pos [value]       : Sets the position of the axis.\n");
   mClient.write("                        0 .. 100 move to absolute position in percentage of the total stroke.\n");
   mClient.write("                        -100 .. +100 move relative in percentage of the total stroke.\n");
   mClient.write("                        p1 .. p4 move to preset position.\n");
-  mClient.write("get pos               : Gets the current position of the axis.\n");
+  mClient.write("get pos               : Gets the current position of the axis.\n\n");
 
-  mClient.write("save                  : Save configuration changes.\n\n");
+  mClient.write("set led1red            : Forces LED1 to red.\n");
+  mClient.write("set led1green          : Forces LED1 to green.\n");
+  mClient.write("set led1redgreen       : Forces LED1 to green.\n");
+  mClient.write("set led1off            : Forces LED1 to red.\n");
+  mClient.write("set led1release        : Releases LED1 to normal behavior.\n\n");
+
   return true;
 }
 
@@ -225,6 +237,35 @@ bool CCommandInterface::Set()
   if (txt == "pos")
     return SetPosition();
 
+  if (txt == "led1red")
+  {
+    CSystem::Get().GetStatus().SetLed1Override(ELedOverride::ForceRed);
+    return true;
+  }
+
+  if (txt == "led1green")
+  {
+    CSystem::Get().GetStatus().SetLed1Override(ELedOverride::ForceGreen);
+    return true;
+  }
+
+  if (txt == "led1redgreen")
+  {
+    CSystem::Get().GetStatus().SetLed1Override(ELedOverride::ForceRedGreen);
+    return true;
+  }
+
+  if (txt == "led1off")
+  {
+    CSystem::Get().GetStatus().SetLed1Override(ELedOverride::ForceOff);
+    return true;
+  }
+
+  if (txt == "led1release")
+  {
+    CSystem::Get().GetStatus().SetLed1Override(ELedOverride::Release);
+    return true;
+  }
   Log::Error("Unexpected keyword: '{}'", txt);
   return false;
 }
