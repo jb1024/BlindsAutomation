@@ -43,7 +43,7 @@ ECordState CCordSwitch::GetNextState()
       mPullCount++;
       return ECordState::Released;
     }
-    if (mTimer.TimeOut(500))
+    if (mTimer.TimeOut(300)) // A held condition detected when held for xx ms
       return ECordState::Held;
   }
 
@@ -51,7 +51,7 @@ ECordState CCordSwitch::GetNextState()
   {
     if (mCurrentValue)
       return ECordState::Pulled;
-    if (mTimer.TimeOut(500))
+    if (mTimer.TimeOut(500)) // Multiple pull counts are countend when released for xx ms
     {
       mFinalPullCount = mPullCount;
       return ECordState::Idle;
@@ -61,7 +61,10 @@ ECordState CCordSwitch::GetNextState()
   if (mState == ECordState::Held)
   {
     if (!mCurrentValue)
+    {
+      mReleaseAdterHeldDetected = true;
       return ECordState::Idle;
+    }
   }
 
   return mState;
@@ -85,4 +88,15 @@ bool CCordSwitch::IsHeld()
   if (mState == ECordState::Held)
     return true;
   return false;
+}
+
+bool CCordSwitch::IsReleasedAdterHeld()
+{
+  auto result = mReleaseAdterHeldDetected;
+  mReleaseAdterHeldDetected = 0;
+
+  if (result)
+    Log::Info("Detected released after held");
+
+  return result;
 }

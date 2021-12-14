@@ -20,15 +20,18 @@ CSystem::CSystem()
 {
   mCords.SetAction(ECordsAction::Cx_Held, [&]() { Reboot(); });
   mCords.SetAction(ECordsAction::C1_Held, [&]() { mAxis.Move1(); });
+  mCords.SetAction(ECordsAction::C1_HeldReleased, [&]() { mAxis.MoveStop(); });
   mCords.SetAction(ECordsAction::C2_Held, [&]() { mAxis.Move2(); });
+  mCords.SetAction(ECordsAction::C2_HeldReleased, [&]() { mAxis.MoveStop(); });
 
   // Set preset 1 if cord 1 or 2 is pulled once
   {
-    auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(1)); };
-    mCords.SetAction(ECordsAction::C1_Pull1, f);
-    mCords.SetAction(ECordsAction::C2_Pull1, f);
+      //  auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(1)); };
+      //  mCords.SetAction(ECordsAction::C1_Pull1, f);
+      //  mCords.SetAction(ECordsAction::C2_Pull1, f);
   }
 
+  // Set preset 2 if cord 1 or 2 is pulled twice
   {
     auto f = [&]() { mAxis.MoveAbsolute(Config::GetPreset(2)); };
     mCords.SetAction(ECordsAction::C1_Pull2, f);
@@ -77,6 +80,7 @@ bool CSystem::ConnectToWifi()
   auto ip = WiFi.localIP();
   Log::Info("Succesfully connected to wifi network.");
   Log::Info("IP: {}.{}.{}.{}", ip[0], ip[1], ip[2], ip[3]);
+  Log::Info("RSSI: {} dBm", WiFi.RSSI());
   return true;
 }
 

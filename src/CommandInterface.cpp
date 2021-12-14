@@ -95,8 +95,12 @@ bool CCommandInterface::SetPositionAbsolute()
 
 bool CCommandInterface::ShowHelp()
 {
-  mClient.write("Version: 0.0.5        : 0.0.5: Added LED override commands.\n");
-  mClient.write("                      : 0.0.4: Just a first version.\n\n");
+  mClient.write("Version:\n");
+  mClient.write("V0.0.6: - Improved servo responsetime on cord release\n");
+  mClient.write("        - tuned cord release timing\n");
+  mClient.write("        - disabled single click\n");
+  mClient.write("V0.0.5: - Added LED override commands.\n");
+  mClient.write("V0.0.4: - Just a first version.\n\n");
 
   mClient.write("reboot                : Reboots the system.\n\n");
 

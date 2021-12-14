@@ -17,6 +17,8 @@ ECordsAction CCords::GetAction()
   uint8_t pulls2 = mCord2.GetNumberOfPulls();
   bool held1 = mCord1.IsHeld();
   bool held2 = mCord2.IsHeld();
+  bool releasedAfterHeld1 = mCord1.IsReleasedAdterHeld();
+  bool releasedAfterHeld2 = mCord2.IsReleasedAdterHeld();
 
   if (held1 && held2)
     return ECordsAction::Cx_Held;
@@ -24,6 +26,14 @@ ECordsAction CCords::GetAction()
     return ECordsAction::C1_Held;
   if (held2)
     return ECordsAction::C2_Held;
+  if (releasedAfterHeld1)
+    return ECordsAction::C1_HeldReleased;
+  if (releasedAfterHeld2)
+    return ECordsAction::C2_HeldReleased;
+  // RVC: CxHeldReleased will not work perfect since the timing between releasing both cords will not be sampled at the
+  // same time
+  if (releasedAfterHeld1 && releasedAfterHeld2)
+    return ECordsAction::Cx_HeldReleased;
 
   if (pulls1 == 1)
     return ECordsAction::C1_Pull1;

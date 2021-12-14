@@ -30,8 +30,11 @@ enum class ECordsAction
   C1_Pull4,
   C2_Pull4,
   C1_Held,
+  C1_HeldReleased,
   C2_Held,
-  Cx_Held
+  C2_HeldReleased,
+  Cx_Held,
+  Cx_HeldReleased
 };
 
 class CCords
