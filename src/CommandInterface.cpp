@@ -95,6 +95,8 @@ bool CCommandInterface::SetPositionAbsolute()
 
 bool CCommandInterface::ShowHelp()
 {
+  mClient.write("Version: 0.0.4        : just a version for now.\n");
+
   mClient.write("reboot                : Reboots the system.\n");
 
   mClient.write("set hostname [value]  : Sets the device hostname name for wifi network.\n");
