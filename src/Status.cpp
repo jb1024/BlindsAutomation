@@ -26,13 +26,13 @@ void CStatus::SetBooting(bool enable)
 void CStatus::SetMoving(bool enable)
 {
   if (!mOverrideLed1)
-  {
-    mMoving = enable;
-    if (mMoving)
-      mRedLed.On();
-    else
-      mRedLed.Off();
-  }
+    return;
+
+  mMoving = enable;
+  if (mMoving)
+    mRedLed.On();
+  else
+    mRedLed.Off();
 }
 
 void CStatus::SetAccessPoint(bool enable)
