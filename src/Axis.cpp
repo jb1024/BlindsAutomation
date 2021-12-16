@@ -144,7 +144,9 @@ void CAxis::Handler()
       mCurrentPosition = mTargetPosition;
   }
 
+  // Adjust the following constants in the file:  .pio/libdeps/nano_33_iot/Servo/src/Servo.h
+  // #define MIN_PULSE_WIDTH 350
+  // #define MAX_PULSE_WIDTH 2500
   int value = static_cast<int>(mCurrentPosition * 1.8); // 100% * 1.8 = 180 degrees
-  // The constant in the file
-  mServo.write(value); // RVC TODO: Make a timer of 50Hz to call writeMicroseconds() with predefined min and max values
+  mServo.write(value);
 }
