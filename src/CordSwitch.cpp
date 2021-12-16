@@ -41,17 +41,17 @@ ECordState CCordSwitch::GetNextState()
     if (!mCurrentValue)
     {
       mPullCount++;
-      return ECordState::Released;
+      return ECordState::ReleasedAfterPull;
     }
-    if (mTimer.TimeOut(500))
+    if (mTimer.TimeOut(300)) // A held condition detected when held for xx ms
       return ECordState::Held;
   }
 
-  if (mState == ECordState::Released)
+  if (mState == ECordState::ReleasedAfterPull)
   {
     if (mCurrentValue)
       return ECordState::Pulled;
-    if (mTimer.TimeOut(500))
+    if (mTimer.TimeOut(500)) // Multiple pull counts are countend when released for xx ms
     {
       mFinalPullCount = mPullCount;
       return ECordState::Idle;

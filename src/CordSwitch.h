@@ -6,10 +6,10 @@
 
 enum class ECordState
 {
-  Idle,     // Waiting for switch
-  Pulled,   // Cord is pulled
-  Released, // Release and waitign for another click
-  Held,
+  Idle,              // Waiting for switch
+  Pulled,            // Cord is pulled
+  ReleasedAfterPull, // Release and waiting for another click
+  Held,              // Cord is held for a longer time
 };
 
 class CCordSwitch
