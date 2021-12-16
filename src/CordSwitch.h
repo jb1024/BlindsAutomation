@@ -6,10 +6,10 @@
 
 enum class ECordState
 {
-  Idle,     // Waiting for switch
-  Pulled,   // Cord is pulled
-  Released, // Release and waiting for another click
-  Held,
+  Idle,              // Waiting for switch
+  Pulled,            // Cord is pulled
+  ReleasedAfterPull, // Release and waiting for another click
+  Held,              // Cord is held for a longer time
 };
 
 class CCordSwitch
@@ -22,7 +22,6 @@ public:
 
   uint8_t GetNumberOfPulls();
   bool IsHeld();
-  bool IsReleasedAdterHeld();
 
 protected:
   CDigitalInOut mDio;
@@ -31,7 +30,6 @@ protected:
   ECordState mState = ECordState::Idle;
   uint32_t mPullCount = 0;
   uint32_t mFinalPullCount = 0;
-  bool mReleaseAdterHeldDetected = false;
 
   void Sample();
   ECordState GetNextState();

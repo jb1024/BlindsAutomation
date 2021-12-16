@@ -73,24 +73,14 @@ void CAxis::MoveRelative(double movement)
   SetPosition(mTargetPosition + movement);
 }
 
-void CAxis::MoveStop(void)
+void CAxis::Stop(void)
 {
   mTargetPosition = mCurrentPosition;
   //#ifdef LOG_AXIS
-  Log::Info("Move stop: current position {}", mCurrentPosition);
+  Log::Info("Stop: current position {}", mCurrentPosition);
   //#endif
 
   SetPosition(mTargetPosition);
-}
-
-void CAxis::Move1()
-{
-  MoveRelative(-0.1);
-}
-
-void CAxis::Move2()
-{
-  MoveRelative(0.1);
 }
 
 void CAxis::Enable()
@@ -155,5 +145,6 @@ void CAxis::Handler()
   }
 
   int value = static_cast<int>(mCurrentPosition * 1.8); // 100% * 1.8 = 180 degrees
+  // The constant in the file
   mServo.write(value); // RVC TODO: Make a timer of 50Hz to call writeMicroseconds() with predefined min and max values
 }

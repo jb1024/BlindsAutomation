@@ -22,10 +22,7 @@ public:
 
   void MoveAbsolute(double position); // 0 .. 100%
   void MoveRelative(double movement); // +/- 0 .. 100%
-  void MoveStop(void);
-
-  void Move1();
-  void Move2();
+  void Stop(void);
 
   double GetPosition();
 
