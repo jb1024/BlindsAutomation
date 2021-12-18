@@ -144,8 +144,11 @@ void CAxis::Handler()
       mCurrentPosition = mTargetPosition;
   }
 
-  // Adjust the following constants in the file:  .pio/libdeps/nano_33_iot/Servo/src/Servo.h
-  // #define MIN_PULSE_WIDTH 350
+  // remove: Adjust the following constants in the file:  .pio/libdeps/nano_33_iot/Servo/src/Servo.h
+  // remove: RVC updated:
+  // remove: (the nano_33_iot folder is automatically selected and not visible in VS)
+  // Adjust the following constants in the file:  .pio/libdeps/Servo/src/Servo.h
+  // #define MIN_PULSE_WIDTH 360
   // #define MAX_PULSE_WIDTH 2500
   int value = static_cast<int>(mCurrentPosition * 1.8); // 100% * 1.8 = 180 degrees
   mServo.write(value);

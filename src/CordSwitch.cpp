@@ -51,7 +51,7 @@ ECordState CCordSwitch::GetNextState()
   {
     if (mCurrentValue)
       return ECordState::Pulled;
-    if (mTimer.TimeOut(500)) // Multiple pull counts are countend when released for xx ms
+    if (mTimer.TimeOut(500)) // Multiple pull counts are counted when released for xx ms
     {
       mFinalPullCount = mPullCount;
       return ECordState::Idle;
