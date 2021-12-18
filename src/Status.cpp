@@ -1,4 +1,5 @@
 #include "Status.h"
+#include "Log.h"
 
 CStatus::CStatus(const SLedPins& pins)
     : mSystemLed(pins.System)
@@ -25,7 +26,9 @@ void CStatus::SetBooting(bool enable)
 
 void CStatus::SetMoving(bool enable)
 {
-  if (!mOverrideLed1)
+  Log::Info("SetMoving Called {}", enable);
+
+  if (mOverrideLed1)
     return;
 
   mMoving = enable;
@@ -37,14 +40,14 @@ void CStatus::SetMoving(bool enable)
 
 void CStatus::SetAccessPoint(bool enable)
 {
-  if (!mOverrideLed1)
-  {
-    mAccessPoint = enable;
-    if (mAccessPoint)
-      mGreenLed.Blink(1000);
-    else
-      mGreenLed.Off();
-  }
+  if (mOverrideLed1)
+    return;
+
+  mAccessPoint = enable;
+  if (mAccessPoint)
+    mGreenLed.Blink(1000);
+  else
+    mGreenLed.Off();
 }
 
 void CStatus::SetLed1Override(ELedOverride override)

@@ -76,9 +76,7 @@ void CAxis::MoveRelative(double movement)
 void CAxis::Stop(void)
 {
   mTargetPosition = mCurrentPosition;
-  //#ifdef LOG_AXIS
   Log::Info("Stop: current position {}", mCurrentPosition);
-  //#endif
 
   SetPosition(mTargetPosition);
 }
