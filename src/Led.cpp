@@ -29,7 +29,7 @@ void CLed::Off()
 
 void CLed::Blink(double delay)
 {
-  Log::Debug("Set blink");
+  //  Log::Debug("Set blink");
   mState = true;
   mDio = true;
   mDelay = delay;
@@ -44,7 +44,7 @@ void CLed::Handler()
     mTimer.Reset();
     if (mBlink)
     {
-      Log::Debug("Toggle");
+      //  Log::Debug("Toggle");
       mState = !mState;
       mDio = mState;
     }

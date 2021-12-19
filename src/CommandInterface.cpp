@@ -96,6 +96,7 @@ bool CCommandInterface::SetPositionAbsolute()
 bool CCommandInterface::ShowHelp()
 {
   mClient.write("Version:\n");
+  mClient.write("V0.0.7: - Logging and other minor updates\n");
   mClient.write("V0.0.6: - Improved servo responsetime on cord release\n");
   mClient.write("        - tuned cord release timing\n");
   mClient.write("        - disabled single click\n");

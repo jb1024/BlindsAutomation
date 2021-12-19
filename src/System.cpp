@@ -80,6 +80,10 @@ bool CSystem::ConnectToWifi()
   auto ssid = Config::GetSsid();
   auto password = Config::GetPassword();
 
+  // mLogToConsole.Enable(); // Enable logging to console since Wifi is not (yet) available. But if I do this the
+  // logging to the socket does not work anymore? Cannot log to both, or better, how to switch over to socket logging?
+  // Test this by corrupting the SSID in the config
+  // Where does the '0' and '1' logging come from? Cannot find it....
   if (ssid.length() == 0)
   {
     Log::Warning("Could not connect to existing wifi network because SSID is not set.");
@@ -90,12 +94,11 @@ bool CSystem::ConnectToWifi()
   auto status = WiFi.begin(ssid.c_str(), password.c_str());
   if (status != WL_CONNECTED)
   {
-    mLogToConsole.Enable();
     Log::Warning("Unable to connect to wifi network: '{}'", ssid);
     return false;
   }
 
-  mLogToSocket.Enable(Config::GetUdpLogger());
+  mLogToSocket.Enable(Config::GetUdpLogger()); // Now that Wifi is enabled start logging to socket
 
   auto ip = WiFi.localIP();
   Log::Info("Succesfully connected to wifi network.");
