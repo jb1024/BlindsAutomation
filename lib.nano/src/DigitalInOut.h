@@ -4,16 +4,13 @@
 
 #include <Pin.h>
 
-enum class EPullMode
-{
-  Off,
-  Up,
-  Down
-};
+#include "IDigitalInOut.h"
 
-class CDigitalInOut
+class CDigitalInOut : public Interfaces::IDigitalInOut
 {
 public:
+  using EPullMode = Interfaces::EPullMode;
+
   CDigitalInOut(const SPin& pin);
   ~CDigitalInOut();
 

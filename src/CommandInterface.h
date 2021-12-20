@@ -1,15 +1,18 @@
 #pragma once
 
-// The command interface opens a socket and listens for incoming commands
-// Commands are executed immedately using the interfaces obtains form the system class
-
-#include <WiFiNINA.h>
+// C++ generic
 #include <stdint.h>
 #include <string>
 
+// Common
 #include "Log.h"
 #include "Parser.h"
+
+// Application
 #include "System.h"
+
+// The command interface opens a socket and listens for incoming commands
+// Commands are executed immedately using the interfaces obtains form the system class
 
 class CCommandInterface : public Log::ILogger
 {

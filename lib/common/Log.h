@@ -1,7 +1,8 @@
 #pragma once
 
-#include <fmt/format.h>
 #include <string>
+
+#include "../../.pio/libdeps/nano/fmt/include/fmt/format.h"
 
 namespace Log
 {

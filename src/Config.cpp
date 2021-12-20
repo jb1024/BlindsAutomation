@@ -1,17 +1,26 @@
+// C++ Generic
 #include <map>
 
-#include <WiFiNINA.h>
-
-#include "Config.h"
+// Common
+#include "Conversion.h"
 #include "Log.h"
 #include "Parser.h"
+
+// Interface implementations
+#include "File.h"
+
+//#include <WiFiNINA.h>
+//#include "ISocket.h"
+
+// Application
+#include "Config.h"
 
 using std::string;
 
 namespace Config
 {
 
-const string ConfigFile = "/fs/config";
+const string ConfigFile = "config";
 
 enum class EField
 {
@@ -187,21 +196,23 @@ bool Load()
 
   Reset();
 
-  auto file = WiFiStorage.open(ConfigFile.c_str());
-  if (!file)
+  CFile file(ConfigFile);
+
+  if (!file.Exist())
   {
-    Log::Warning("Config file could not be opened, reverting to defaults.");
+    Log::Warning("Config file not found.");
     return false;
   }
 
   string content;
+  auto todo = file.Size();
 
   char buffer[100];
-
-  while (file.available())
+  while (todo > 0)
   {
-    auto amount = file.read(buffer, sizeof(buffer));
+    auto amount = file.Read(buffer, sizeof(buffer));
     content.append(buffer, amount);
+    todo -= amount;
   }
 
   Log::Info("{} bytes read.", content.size());
@@ -217,17 +228,16 @@ bool Save()
   for (auto& i : ConfigMap)
     content.append(fmt::format("{}={}\n", ToString(i.first), i.second));
 
-  auto file = WiFiStorage.open(ConfigFile.c_str());
-  file.erase();
+  CFile file(ConfigFile);
+  file.Delete();
+  auto written = file.Write(content.data(), content.size());
 
-  auto amount = file.write(content.data(), content.size());
-  if (amount != content.size())
+  if (written != content.size())
   {
     Log::Error("Unable to write configuration file.");
-    file.erase();
+    file.Delete();
     return false;
   }
-  file.close();
 
   Log::Info("{} bytes written.", content.size());
   return true;

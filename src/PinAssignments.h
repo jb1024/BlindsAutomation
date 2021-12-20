@@ -1,7 +1,9 @@
 #pragma once
 
+// C++ generic
 #include <cstdint>
 
+// Typedef
 #include <Pin.h>
 
 const struct SPins

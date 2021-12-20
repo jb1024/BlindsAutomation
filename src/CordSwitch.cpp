@@ -5,7 +5,7 @@ CCordSwitch::CCordSwitch(const SPin& pin)
     : mDio(pin)
 {
   // Enable pullup because pin is switched to GND
-  mDio.SetPullMode(EPullMode::Up);
+  mDio.SetPullMode(Interfaces::EPullMode::Up);
 }
 
 CCordSwitch::~CCordSwitch()

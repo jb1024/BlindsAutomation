@@ -1,6 +1,6 @@
 #include "Timer.h"
 
-#include <Arduino.h>
+#include "Platform.h"
 
 CTimer::CTimer()
 {

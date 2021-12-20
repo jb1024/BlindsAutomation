@@ -2,10 +2,23 @@
 #include "Config.h"
 #include "System.h"
 
-CCommandInterface ci(5000);
+#include "Console.h"
+#include "LogToConsole.h"
+// CCommandInterface ci(5000);
+#include <iostream>
 
+CLogToConsole logToConsole;
 void setup()
 {
+  Console::WaitForConnection(1000);
+
+  logToConsole.Enable();
+
+  Config::Load();
+
+  Log::Info("Hostname: {}", Config::GetHostname());
+  Log::Info("SSID: {}", Config::GetSsid());
+
   // Use code below to set your wifi credentials directly without using the accesspoint
   // Don't forget to remove this code before releasing.
   // Config::Load();
@@ -17,11 +30,12 @@ void setup()
 
   // Extra comments....
 
-  CSystem::Get().Initialize();
+  // CSystem::Get().Initialize();
 }
 
 void loop()
 {
-  CSystem::Get().Handler();
-  ci.Handler();
+
+  // CSystem::Get().Handler();
+  // ci.Handler();
 }

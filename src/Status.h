@@ -1,9 +1,13 @@
 #pragma once
 
-#include "Led.h"
+// C++ generic header files
+#include <cstdint>
+
+// Typedef header files
 #include "Pin.h"
 
-#include <cstdint>
+// Implementation header files
+#include "Led.h"
 
 // RVC should this enum class be in a namespace?
 enum class ELedOverride

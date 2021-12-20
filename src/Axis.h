@@ -1,9 +1,13 @@
 #pragma once
 
-#include <Servo.h>
+// Types
+#include "Pin.h"
 
-#include <Pin.h>
-#include <Timer.h>
+// Common
+#include "Timer.h"
+
+// Target specific
+#include "Pwm.h"
 
 class CAxis
 {
@@ -27,15 +31,17 @@ public:
   double GetPosition();
 
 protected:
-  uint8_t mPin;
-  Servo mServo;
+  CPwm mPwm;
+  CTimer mTimer;
+  double mPwmMin = 350;
+  double mPwmMax = 2500;
   double mSpeed = 10;
   double mCurrentPosition = 50;
   double mTargetPosition = 50;
   bool mEnabled = false;
-  CTimer mTimer;
 
   void SetPosition(double position);
+  void SetPwmForPosition(double position);
   void Enable();
   void Disable();
 };

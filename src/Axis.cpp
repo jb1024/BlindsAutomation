@@ -1,12 +1,16 @@
-#include "Axis.h"
+
+// Common
 #include "Log.h"
-#include "System.h"
 #include "Timer.h"
 
-#include <Arduino.h>
+// Application
+#include "System.h"
+
+// Self
+#include "Axis.h"
 
 CAxis::CAxis(const SPin& pin)
-    : mPin(pin.Pin)
+    : mPwm(pin)
 {
 }
 
@@ -14,11 +18,24 @@ CAxis ::~CAxis()
 {
 }
 
+void CAxis::SetPwmForPosition(double position)
+{
+  // remove: Adjust the following constants in the file:  .pio/libdeps/nano_33_iot/Servo/src/Servo.h
+  // remove: RVC updated:
+  // remove: (the nano_33_iot folder is automatically selected and not visible in VS)
+  // Adjust the following constants in the file:  .pio/libdeps/Servo/src/Servo.h
+  // #define MIN_PULSE_WIDTH 360
+  // #define MAX_PULSE_WIDTH 2500
+
+  // Position is from 0 to 100%
+  auto range = mPwmMax - mPwmMin;
+  auto width = range * (position / 100);
+  mPwm.SetPulseWidth(width);
+}
+
 void CAxis::Initialize()
 {
-  int value = static_cast<int>(mCurrentPosition * 1.8);
-  mServo.write(value);
-
+  SetPwmForPosition(50);
   Enable();
   delay(500);
   Disable();
@@ -86,7 +103,7 @@ void CAxis::Enable()
   if (!mEnabled)
   {
     Log::Debug("Axis enabled.");
-    mServo.attach(mPin);
+    SetPwmForPosition(mCurrentPosition);
     mEnabled = true;
     CSystem::Get().GetStatus().SetMoving(true);
   }
@@ -97,9 +114,9 @@ void CAxis::Disable()
   if (mEnabled)
   {
     delay(500);
+    mPwm.SetPulseWidth(0);
     // Give axis minimum time to move
     Log::Debug("Axis disabled.");
-    mServo.detach();
     mEnabled = false;
     CSystem::Get().GetStatus().SetMoving(false);
   }
@@ -142,12 +159,5 @@ void CAxis::Handler()
       mCurrentPosition = mTargetPosition;
   }
 
-  // remove: Adjust the following constants in the file:  .pio/libdeps/nano_33_iot/Servo/src/Servo.h
-  // remove: RVC updated:
-  // remove: (the nano_33_iot folder is automatically selected and not visible in VS)
-  // Adjust the following constants in the file:  .pio/libdeps/Servo/src/Servo.h
-  // #define MIN_PULSE_WIDTH 360
-  // #define MAX_PULSE_WIDTH 2500
-  int value = static_cast<int>(mCurrentPosition * 1.8); // 100% * 1.8 = 180 degrees
-  mServo.write(value);
+  SetPwmForPosition(mCurrentPosition);
 }

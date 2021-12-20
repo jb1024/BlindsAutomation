@@ -1,10 +1,11 @@
-#include <Arduino.h>
-
-#include "WiFiNINA.h"
-
-#include "Config.h"
+// Common
 #include "Log.h"
+
+// Implementation
+#include "Config.h"
 #include "PinAssignments.h"
+
+// Self
 #include "System.h"
 
 CSystem& CSystem::Get()

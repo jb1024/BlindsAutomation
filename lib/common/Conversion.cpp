@@ -6,6 +6,7 @@
 #include "Socket.h"
 
 using std::string;
+using namespace Interfaces;
 
 bool ToSocketAddress(const std::string& txt, SSocketAddress& sa)
 {

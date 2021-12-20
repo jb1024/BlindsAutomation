@@ -1,10 +1,13 @@
 #pragma once
 
+// Common
+#include "LogToConsole.h"
+#include "LogToSocket.h"
+
+// Implementation
 #include "Axis.h"
 #include "Config.h"
 #include "Cords.h"
-#include "LogToConsole.h"
-#include "LogToSocket.h"
 #include "Status.h"
 
 class CSystem

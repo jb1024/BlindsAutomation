@@ -1,5 +1,8 @@
-#include "Status.h"
+// Common header files
 #include "Log.h"
+
+// Self
+#include "Status.h"
 
 CStatus::CStatus(const SLedPins& pins)
     : mSystemLed(pins.System)

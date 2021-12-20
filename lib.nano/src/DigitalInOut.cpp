@@ -1,5 +1,7 @@
 #include "DigitalInOut.h"
 
+using namespace Interfaces;
+
 CDigitalInOut::CDigitalInOut(const SPin& pin)
 {
   mPort = g_APinDescription[pin.Pin].ulPort;

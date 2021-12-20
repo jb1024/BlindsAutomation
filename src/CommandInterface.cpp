@@ -1,7 +1,10 @@
-#include "Config.h"
+// Common
+#include "Conversion.h"
 #include "Log.h"
 
+// Application
 #include "CommandInterface.h"
+#include "Config.h"
 
 using std::string;
 

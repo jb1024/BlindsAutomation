@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Socket.h"
+#include "SocketAddress.h"
 
 namespace Config
 {
