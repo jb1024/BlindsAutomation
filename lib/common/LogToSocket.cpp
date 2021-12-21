@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+
 #include "LogToSocket.h"
 
 #include "Log.h"
@@ -23,6 +25,11 @@ void CLogToSocket::Enable(const SSocketAddress& sa)
     Log::RegisterLogger(*this);
     Log::Info("Logging to {}:{}", mIp, mPort);
   }
+}
+
+void CLogToSocket::Disable()
+{
+  Log::UnregisterLogger(*this);
 }
 
 string CLogToSocket::GetSeverityString(Log::ESeverity level)

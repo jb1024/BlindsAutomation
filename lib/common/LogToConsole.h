@@ -9,6 +9,7 @@ public:
   virtual ~CLogToConsole();
 
   void Enable();
+  void Disable();
 
   void OnLog(Log::ESeverity level, const std::string& msg) override;
 };

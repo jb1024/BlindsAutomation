@@ -13,6 +13,7 @@ public:
   virtual ~CLogToSocket();
 
   void Enable(const SSocketAddress& sa);
+  void Disable();
 
   void OnLog(Log::ESeverity level, const std::string& msg) override;
 

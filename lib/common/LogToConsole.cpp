@@ -17,6 +17,11 @@ void CLogToConsole::Enable()
   Log::RegisterLogger(*this);
 }
 
+void CLogToConsole::Disable()
+{
+  Log::UnregisterLogger(*this);
+}
+
 void CLogToConsole::OnLog(Log::ESeverity level, const std::string& msg)
 {
   Console::WriteLine(msg.c_str());
