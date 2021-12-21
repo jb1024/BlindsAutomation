@@ -4,6 +4,9 @@
 #include "LogToConsole.h"
 #include "LogToSocket.h"
 
+// Platform specific
+#include "AccessPoint.h"
+
 // Implementation
 #include "Axis.h"
 #include "Config.h"
@@ -31,6 +34,7 @@ protected:
 
   CLogToConsole mLogToConsole;
   CLogToSocket mLogToSocket;
+  CAccessPoint mAccessPoint;
 
   CStatus mStatus;
   CAxis mAxis;

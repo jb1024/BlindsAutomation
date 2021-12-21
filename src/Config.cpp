@@ -6,11 +6,8 @@
 #include "Log.h"
 #include "Parser.h"
 
-// Interface implementations
+// Platform specific
 #include "File.h"
-
-//#include <WiFiNINA.h>
-//#include "ISocket.h"
 
 // Application
 #include "Config.h"

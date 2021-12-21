@@ -19,6 +19,8 @@ CSystem::CSystem()
     , mAxis(Pins.Servo)
     , mCords(Pins.Cord1, Pins.Cord2)
 {
+  mLogToConsole.Enable();
+
   /* Code below is for debugging all possible cord actions:
 
     mCords.SetAction(ECordsAction::C1_Pull1, [&]() { Log::Debug("C1_Pull1"); });
@@ -82,45 +84,38 @@ bool CSystem::ConnectToWifi()
   auto password = Config::GetPassword();
 
   // mLogToConsole.Enable(); // Enable logging to console since Wifi is not (yet) available. But if I do this the
-  // logging to the socket does not work anymore? Cannot log to both, or better, how to switch over to socket logging?
-  // Test this by corrupting the SSID in the config
-  // Where does the '0' and '1' logging come from? Cannot find it....
+  // logging to the socket does not work anymore? Cannot log to both, or better, how to switch over to socket
+  // logging? Test this by corrupting the SSID in the config Where does the '0' and '1' logging come from? Cannot
+  // find it....
   if (ssid.length() == 0)
   {
     Log::Warning("Could not connect to existing wifi network because SSID is not set.");
     return false;
   }
 
-  Log::Info("Connecting to existing wifi network...");
-  auto status = WiFi.begin(ssid.c_str(), password.c_str());
-  if (status != WL_CONNECTED)
-  {
-    Log::Warning("Unable to connect to wifi network: '{}'", ssid);
+  auto connected = mAccessPoint.Connect(ssid, password);
+  if (!connected)
     return false;
-  }
 
-  mLogToSocket.Enable(Config::GetUdpLogger()); // Now that Wifi is enabled start logging to socket
+  Log::Info("Reporting is now switched to UDP logging.");
+  mLogToConsole.Disable();
+  mLogToSocket.Enable(Config::GetUdpLogger()); // Now that Wifi is enabled switch to udp logging
 
-  auto ip = WiFi.localIP();
-  Log::Info("Succesfully connected to wifi network.");
-  Log::Info("IP: {}.{}.{}.{}", ip[0], ip[1], ip[2], ip[3]);
-  Log::Info("RSSI: {} dBm", WiFi.RSSI());
+  mAccessPoint.ReportStatus();
   return true;
 }
 
 bool CSystem::CreateAccessPoint()
 {
   Log::Info("Creating access point...");
-  WiFi.config(IPAddress(10, 0, 0, 1));
-  auto status = WiFi.beginAP(Config::GetHostname().c_str());
-  if (status != WL_AP_LISTENING)
-  {
-    Log::Error("Unable to create access point.");
+
+  auto hostname = Config::GetHostname();
+  auto created = mAccessPoint.Create(hostname, "10.0.0.1");
+
+  if (!created)
     return false;
-  }
 
   mStatus.SetAccessPoint(true);
-  Log::Info("Access point created.");
   Log::Info("Goto http://10.0.0.1 for device configuration.");
   return true;
 }
